@@ -3,11 +3,11 @@
  * @Usage:
  * @Author: xxx
  * @Date: 2020-12-24 10:32:14
- * @LastEditTime: 2023-03-05 00:20:11
+ * @LastEditTime: 2023-03-05 00:23:06
  */
 import { Koatty, Logger, Helper } from "koatty";
 import Consul, { ConsulOptions } from "consul";
-import { randomUUID } from "crypto";
+// import { randomUUID } from "crypto";
 
 /**
  *
