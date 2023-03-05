@@ -3,11 +3,12 @@
  * @Usage:
  * @Author: xxx
  * @Date: 2020-12-24 10:32:14
- * @LastEditTime: 2023-03-05 00:23:06
+ * @LastEditTime: 2023-03-05 11:55:50
  */
 import { Koatty, Logger, Helper } from "koatty";
 import Consul, { ConsulOptions } from "consul";
-// import { randomUUID } from "crypto";
+import { randomUUID } from "crypto";
+import { address } from "ip";
 
 /**
  *
@@ -67,8 +68,8 @@ const defaultOptions: OptionsInterface = {
   //   },
   // },
 
-  host: "127.0.0.1",
-  port: "8500",
+  host: "127.0.0.1", // consul host
+  port: "8500", // consul port
   promisify: true,
   secure: false,
 };
@@ -76,6 +77,22 @@ const defaultOptions: OptionsInterface = {
 export function KoattyConsul(options: OptionsInterface, app: Koatty): Promise<any> {
   // todo
   const opt = { ...defaultOptions, ...options };
+  if (opt.self) {
+    if (!opt.self.id) {
+      opt.self.id = randomUUID();
+    }
+    const localIp = address("public") || 'localhost';
+    if (!opt.self.address) {
+      opt.self.address = `${localIp}:3000`;
+    }
+    if (!opt.self.check || !opt.self.check.tcp) {
+      opt.self.check = {
+        tcp: opt.self.check.tcp || `${localIp}:3000`,
+        interval: opt.self.check.interval || "10s",
+        timeout: opt.self.check.timeout || "5s",
+      };
+    }
+  }
   const consul = new Consul(opt);
 
   const RegisterService = function (opt: RegisterServiceOpt) {
@@ -87,6 +104,16 @@ export function KoattyConsul(options: OptionsInterface, app: Koatty): Promise<an
       RegisterService(opt.self);
     })
   }
+
+  const DeRegisterService = function (id: string) {
+    return consul.agent.service.deregister(id);
+  }
+  if (opt.self) {
+    app.once("appStop", function () {
+      DeRegisterService(opt.self.id);
+    })
+  }
+  app.setMetaData("DeRegisterService", DeRegisterService);
 
 
   const ResolverService = async function (opts: ResolverServiceOpt) {
