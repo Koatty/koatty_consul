@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/Koatty/koatty_consul/compare/v1.0.1...v1.1.0) (2023-03-05)
+
+
+### Features
+
+* 自动获取本地ip ([d0498c0](https://github.com/Koatty/koatty_consul/commit/d0498c0822ff09919b2b760e0ed199cd02a77e57))
+
 ### 1.0.1 (2023-03-04)
 
 
